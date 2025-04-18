@@ -2,6 +2,7 @@ from .session import engine, session
 from .models import Base, ParserData
 from sqlalchemy import inspect, update, select, delete
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import InterfaceError
 
 
 def create_tables_if_not_exist():
@@ -16,18 +17,21 @@ def drop_tables():
         Base.metadata.drop_all(conn)
         
 def add_post(url, header, text, theme=None, author=None, date=None):
-    with Session(engine) as session:
-        session.add(
-            ParserData(
-                url=url,
-                theme=theme,
-                header=header,
-                text=text,
-                author=author,
-                date=date
+    try:
+        with Session(engine) as session:
+            session.add(
+                ParserData(
+                    url=url,
+                    theme=theme,
+                    header=header,
+                    text=text,
+                    author=author,
+                    date=date
+                )
             )
-        )
-        session.commit()
+            session.commit()
+    except InterfaceError:
+        pass
         
 def update_post_by_url(url, data):
     with Session(engine) as session:
