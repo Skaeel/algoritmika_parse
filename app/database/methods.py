@@ -64,5 +64,17 @@ def delete_post_by_url(url: str):
         session.commit()
 
 def get_last_date_post():
-    pass
+    try:
+        with Session(engine) as session:
+            stmt = (
+                select(ParserData.date)
+                .order_by(ParserData.date.desc())
+                .limit(1)
+            )
+            result = session.execute(stmt)
+            last_date = result.scalar()
+            return last_date
+    except Exception as e:
+        print(f"[ERROR] Ошибка при получении последней даты новости из БД: {e}")
+        return None
 
