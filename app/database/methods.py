@@ -2,6 +2,7 @@ from .session import engine, session
 from .models import Base, ParserData
 from sqlalchemy import inspect, update, select, delete
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.postgresql import insert
 
 
 def create_tables_if_not_exist():
@@ -77,4 +78,21 @@ def get_last_date_post():
     except Exception as e:
         print(f"[ERROR] Ошибка при получении последней даты новости из БД: {e}")
         return None
-
+    
+def insert_received_data(received_data: list) -> None:
+    try:
+        with Session(engine) as session:
+            for url, theme, header, text, author, date in received_data:
+                session.add(
+                    ParserData(
+                        url=url,
+                        theme=theme,
+                        header=header,
+                        text=text,
+                        author=author,
+                        date=date
+                    )
+                )
+        session.commit()
+    except Exception as e:
+        print(f"[ERROR] Ошибка при добавлении полученных данных: {e}")

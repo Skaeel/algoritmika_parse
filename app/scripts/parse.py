@@ -1,5 +1,6 @@
 import requests
 import os
+from typing import Optional
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from datetime import datetime
@@ -19,11 +20,13 @@ class ParseManager:
         self.soup_links = BeautifulSoup(self.req_links.content, "lxml")
     
     def comparing_dates(self, db_date: datetime, post_date: datetime) -> bool:
-        if post_date > db_date:
-            return True
-        return False
+        if db_date:
+            if post_date > db_date:
+                return True
+            return False
+        return True
         
-    def get_posts_links_with_dates(self):
+    def get_posts_links_with_dates(self) -> Optional[dict]:
         try: 
             result = {}
             if self.req_links.status_code == 200:
@@ -56,13 +59,11 @@ class ParseManager:
             print(f"[CRITICAL] Непредвиденная ошибка: {e}")
             return None
         
-    def parse_links(self, links_dates_dict: dict):
+    def parse_links(self, links_dates_dict: dict) -> Optional[list]:
         try:
             result = []
             
             db_last_date = get_last_date_post()
-            if not db_last_date:
-                return None
             
             for link, date in links_dates_dict.items():
                 if not self.comparing_dates(db_last_date, date):
