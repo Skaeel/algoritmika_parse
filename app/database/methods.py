@@ -3,6 +3,7 @@ from .models import Base, ParserData
 from sqlalchemy import inspect, update, select, delete
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def create_tables_if_not_exist():
@@ -75,7 +76,7 @@ def get_last_date_post():
             result = session.execute(stmt)
             last_date = result.scalar()
             return last_date
-    except Exception as e:
+    except SQLAlchemyError as e:
         print(f"[ERROR] Ошибка при получении последней даты новости из БД: {e}")
         return None
     
@@ -93,6 +94,7 @@ def insert_received_data(received_data: list) -> None:
                         date=date
                     )
                 )
-        session.commit()
-    except Exception as e:
+            session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
         print(f"[ERROR] Ошибка при добавлении полученных данных: {e}")

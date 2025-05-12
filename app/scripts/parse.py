@@ -37,13 +37,14 @@ class ParseManager:
                         link = elem.find("a", href=True)
                         if link:
                             link = link["href"]
-                            if "/text/" in link and "?" not in link:
+                            if "/text/" in link and "?" not in link and "longread" not in link:
                                 links.append(link)
                     
                     time_tags = self.soup_links.find_all("time", class_="_2DfZq")
                     dates = []
                     for tag in time_tags:
                         datetime_value = tag.get("datetime")
+                        datetime_value = datetime.strptime(datetime_value, "%Y-%m-%dT%H:%M:%S")
                         dates.append(datetime_value)
                     
                     result = dict(zip(links, dates))
