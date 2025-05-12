@@ -1,3 +1,4 @@
+import os
 from .session import engine, session
 from .models import Base, ParserData
 from sqlalchemy import inspect, update, select, delete
@@ -5,6 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
 
+TARGET_URL = os.getenv("TARGET_URL")
 
 def create_tables_if_not_exist():
     with engine.begin() as conn:
@@ -86,7 +88,7 @@ def insert_received_data(received_data: list) -> None:
             for url, theme, header, text, author, date in received_data:
                 session.add(
                     ParserData(
-                        url=url,
+                        url=TARGET_URL + url,
                         theme=theme,
                         header=header,
                         text=text,

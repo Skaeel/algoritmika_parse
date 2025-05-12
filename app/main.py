@@ -1,3 +1,4 @@
+import time
 from app.scripts.parse import ParseManager
 from app.database.methods import (
     create_tables_if_not_exist,
@@ -16,4 +17,7 @@ def main():
     insert_received_data(received_data)
 
 if __name__ == "__main__":
+    start = time.time()
     main()
+    end = time.time()
+    print(f"[TIMESPENT] {end-start} sec.")
